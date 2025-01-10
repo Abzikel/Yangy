@@ -1,0 +1,4 @@
+# Ignore these files on github
+__pycache__/
+.env
+settings.txt

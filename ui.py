@@ -1,79 +1,8 @@
 # Created by Abzikel
-from pynput.keyboard import Controller, Key
 import tkinter as tk
-import os
-import json
 import threading
-import time
-import random
-
-# Initialize keyboard controller
-keyboard = Controller()
-
-# Mapping keys to pynput's Key constants
-KEY_MAPPING = {
-    "F1": Key.f1,
-    "F2": Key.f2,
-    "F3": Key.f3,
-    "F4": Key.f4,
-    "F5": Key.f5,
-    "F6": Key.f6,
-    "F7": Key.f7,
-    "F8": Key.f8,
-    "F9": Key.f9,
-    "F10": Key.f10,
-    "F11": Key.f11,
-    "F12": Key.f12,
-    "Z": "z",  
-}
-
-# Function to press and release a key
-def press_and_release_key(key):
-    try:
-        # Check if the key is mapped
-        mapped_key = KEY_MAPPING.get(key, key)  # Use the key directly if not mapped
-        keyboard.press(mapped_key)
-        time.sleep(0.05)  # Simulate a short delay for key press
-        keyboard.release(mapped_key)
-        print(f"Pressed and released: {key}")
-    except Exception as e:
-        print(f"Error pressing key {key}: {e}")
-
-# Function to initialize the settings file
-def initialize_settings_file():
-    # Default configuration
-    default_settings = {
-        "autoHunting": {
-            "potion1": {"text": "F1", "active": False, "delay": "400-600"},
-            "potion2": {"text": "F2", "active": False, "delay": "10000-15000"},
-            "potion3": {"text": "F3", "active": False, "delay": "601000"},
-            "potion4": {"text": "F4", "active": False, "delay": "601000"},
-            "skill1": {"text": "1", "active": False, "delay": "12000"},
-            "skill2": {"text": "2", "active": False, "delay": "12000"},
-            "autoPicking": True,
-            "autoPickingDelay": "600-800"
-        }
-    }
-    
-    # Check if the file exists
-    if not os.path.exists("settings.txt"):
-        # Create the file with default settings
-        with open("settings.txt", "w") as file:
-            json.dump(default_settings, file, indent=4)
-        print("Default settings file created.")
-    else:
-        print("Settings file already exists.")
-        
-# Function to load settings from the file
-def load_settings():
-    initialize_settings_file()
-    with open("settings.txt", "r") as file:
-        return json.load(file)
-    
-# Function to save settings to the file
-def save_settings(auto_hunting_settings):
-    with open("settings.txt", "w") as file:
-        json.dump({"autoHunting": auto_hunting_settings}, file, indent=4)
+from bot import auto_hunting
+from config import load_settings, save_settings
 
 # Function to open the main window
 def open_main_window(current_window):
@@ -95,67 +24,6 @@ def open_main_window(current_window):
 
     # Run the main window
     root.mainloop()
-
-# Auto Hunting
-def auto_hunting(settings, stop_event, running_window):
-    try:
-        active_settings = settings["autoHunting"]
-
-        # Initialize last execution times for each active action
-        last_execution_times = {
-            key: 0 for key, value in active_settings.items() if isinstance(value, dict) and value.get("active")
-        }
-        last_auto_picking_time = 0  # Separate variable for Auto Picking
-
-        # Initial 5-second delay before starting the bot
-        print("Starting bot in 5 seconds...")
-        time.sleep(5)
-
-        # Main bot loop
-        while not stop_event.is_set():
-            current_time = time.time()  # Current timestamp in seconds
-
-            # Process each active key
-            for key, value in active_settings.items():
-                if isinstance(value, dict) and value.get("active"):
-                    key_to_press = value["text"]
-                    delay = value["delay"]
-
-                    # Determine the delay (random or fixed)
-                    if "-" in delay:
-                        min_delay, max_delay = map(int, delay.split("-"))
-                        wait_time = random.randint(min_delay, max_delay) / 1000  # Convert to seconds
-                    else:
-                        wait_time = int(delay) / 1000  # Convert to seconds
-
-                    # Check if the key is ready to be pressed
-                    if current_time - last_execution_times[key] >= wait_time:
-                        press_and_release_key(key_to_press)
-                        print(f"Pressed {key_to_press}, next in {wait_time} seconds")
-                        time.sleep(1)
-                        last_execution_times[key] = current_time
-
-            # Auto Picking logic
-            if active_settings.get("autoPicking"):
-                auto_picking_delay = active_settings.get("autoPickingDelay", "500")
-                if "-" in auto_picking_delay:
-                    min_delay, max_delay = map(int, auto_picking_delay.split("-"))
-                    wait_time = random.randint(min_delay, max_delay) / 1000
-                else:
-                    wait_time = int(auto_picking_delay) / 1000
-
-                # Check if Auto Picking is ready to execute
-                if current_time - last_auto_picking_time >= wait_time:
-                    press_and_release_key("z")
-                    print(f"Pressed Z (Auto Picking), next in {wait_time} seconds")
-                    last_auto_picking_time = current_time
-
-            # Small delay to avoid high CPU usage
-            time.sleep(0.01)
-    except Exception as e:
-        print(f"Error in bot: {e}")
-    finally:
-        stop_event.set()  # Ensure the stop event is set in case of failure
         
 # Function to open the Auto Hunting window
 def open_auto_hunting_window(current_window):
@@ -362,8 +230,3 @@ def open_auto_hunting_settings_window(current_window):
 
     # Run the Settings window
     auto_hunting_settings_window.mainloop()
-
-# Start the application with the main window
-if __name__ == "__main__":
-    root = tk.Tk()
-    open_main_window(root)
