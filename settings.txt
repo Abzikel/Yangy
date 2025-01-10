@@ -1,0 +1,36 @@
+{
+    "autoHunting": {
+        "potion1": {
+            "text": "F1",
+            "delay": "400-600",
+            "active": false
+        },
+        "potion2": {
+            "text": "F2",
+            "delay": "10000-15000",
+            "active": false
+        },
+        "potion3": {
+            "text": "F3",
+            "delay": "601000",
+            "active": false
+        },
+        "potion4": {
+            "text": "F4",
+            "delay": "601000",
+            "active": false
+        },
+        "skill1": {
+            "text": "1",
+            "delay": "12000",
+            "active": true
+        },
+        "skill2": {
+            "text": "2",
+            "delay": "12000",
+            "active": true
+        },
+        "autoPicking": true,
+        "autoPickingDelay": "600-800"
+    }
+}
