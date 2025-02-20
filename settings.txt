@@ -22,7 +22,7 @@
         },
         "skill1": {
             "text": "1",
-            "delay": "12000",
+            "delay": "12000-15000",
             "active": true
         },
         "skill2": {

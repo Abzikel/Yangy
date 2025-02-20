@@ -22,6 +22,10 @@ def open_main_window(current_window):
     auto_hunting_button = tk.Button(button_frame, text="Auto hunting", width=15, command=lambda: open_auto_hunting_window(root))
     auto_hunting_button.pack(pady=10)
 
+    # Fragments Button
+    auto_hunting_button = tk.Button(button_frame, text="Fragments", width=15)
+    auto_hunting_button.pack(pady=10)
+
     # Run the main window
     root.mainloop()
         
